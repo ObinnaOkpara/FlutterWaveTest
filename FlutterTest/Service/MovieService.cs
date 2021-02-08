@@ -3,6 +3,7 @@ using FlutterTest.Interface;
 using FlutterTest.Model;
 using FlutterTest.ViewModels.Stat;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,17 +15,20 @@ namespace FlutterTest.Service
 {
     public class MovieService: IMovieService
     {
-        private readonly IWebHostEnvironment _environment;
-        public MovieService(IWebHostEnvironment environment)
+        private readonly IConfiguration _configuration;
+
+        public List<MetaData> database = new List<MetaData>();
+
+        public MovieService(IConfiguration configuration)
         {
-            _environment = environment;
+            _configuration = configuration;
         }
 
 
         public List<StatVM> GetMovieStats()
         {
-            var allStats = StaticMethods.GetStatFromCSV(Path.Combine(_environment.ContentRootPath, "Data/stats.csv"));
-            var metaDatas = StaticMethods.GetMetaDataFromCSV(Path.Combine(_environment.ContentRootPath, "Data/metadata.csv"));
+            var allStats = StaticMethods.GetStatFromCSV(_configuration.GetValue<string>("statPath"));
+            var metaDatas = StaticMethods.GetMetaDataFromCSV(_configuration.GetValue<string>("metadataPath"));
 
 
             var uniqueMovies = metaDatas.GroupBy(m => m.MovieId).Select(g => g.First());

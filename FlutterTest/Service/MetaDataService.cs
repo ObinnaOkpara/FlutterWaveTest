@@ -3,6 +3,7 @@ using FlutterTest.Interface;
 using FlutterTest.Model;
 using FlutterTest.ViewModels.MetaData;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,13 +15,13 @@ namespace FlutterTest.Service
 {
     public class MetaDataService : IMetaDataService
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
         public List<MetaData> database = new List<MetaData>();
 
-        public MetaDataService(IWebHostEnvironment environment)
+        public MetaDataService(IConfiguration configuration)
         {
-            _environment = environment;
+            _configuration = configuration;
         }
 
         public bool PostMetaData(MetaDataVM model)
@@ -42,7 +43,7 @@ namespace FlutterTest.Service
         }
         public List<MetaDataVM> GetMetaDataByMovieId(int movieId)
         {
-            var db = StaticMethods.GetMetaDataFromCSV(Path.Combine(_environment.ContentRootPath, "Data/metadata.csv"));
+            var db = StaticMethods.GetMetaDataFromCSV(_configuration.GetValue<string>("metadataPath"));
 
             var allMetaDataForMovie = db.Where(m => 
                 m.MovieId == movieId &&
